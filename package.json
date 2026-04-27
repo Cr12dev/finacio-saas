@@ -1,0 +1,24 @@
+{
+  "name": "finacio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend:lint": "npm run lint --workspace=frontend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1",
+    "axios": "^1.15.2",
+    "react-router-dom": "^7.14.2"
+  }
+}
