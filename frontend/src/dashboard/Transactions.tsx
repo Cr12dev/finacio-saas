@@ -3,6 +3,13 @@ import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsMobile } from '../../hooks/useMobileDevice'
 
+/**
+ * Transactions page component.
+ * Displays and manages all financial transactions.
+ * Includes responsive sidebar with toggle functionality for mobile.
+ * 
+ * @returns JSX element containing the transactions layout
+ */
 export default function Transactions() {
   const { isOpen, toggle, close } = useSidebar()
   const isMobile = useIsMobile()

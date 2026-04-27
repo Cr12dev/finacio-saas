@@ -6,6 +6,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useIsMobile } from '../../hooks/useMobileDevice'
 import { Button } from '../components/ui/button'
 
+/**
+ * Login page component.
+ * Provides user authentication with email and password.
+ * Responsive design with different layouts for mobile and desktop.
+ * Stores authentication token and user data in localStorage on success.
+ * 
+ * @returns JSX element containing the login form
+ */
 export default function Login() {
   const isMobile = useIsMobile()
 

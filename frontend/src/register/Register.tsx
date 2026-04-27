@@ -6,6 +6,15 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useIsMobile } from '../../hooks/useMobileDevice'
 import { Button } from '../components/ui/button'
 
+/**
+ * Register page component.
+ * Provides user registration with name, email, and password.
+ * Includes password confirmation and terms agreement.
+ * Responsive design with different layouts for mobile and desktop.
+ * Stores authentication token and user data in localStorage on success.
+ * 
+ * @returns JSX element containing the registration form
+ */
 export default function Register() {
   const isMobile = useIsMobile()
 

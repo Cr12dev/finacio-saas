@@ -7,6 +7,14 @@ import StatsCards from './components/StatsCards'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsMobile } from '../../hooks/useMobileDevice'
 
+/**
+ * Dashboard page component.
+ * Main dashboard view displaying financial overview with stats cards,
+ * spending charts, budget progress, and recent transactions.
+ * Includes responsive sidebar with toggle functionality for mobile.
+ * 
+ * @returns JSX element containing the dashboard layout
+ */
 export default function Dashboard() {
   const { isOpen, toggle, close } = useSidebar()
   const isMobile = useIsMobile()

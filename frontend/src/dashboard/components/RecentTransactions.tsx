@@ -1,14 +1,27 @@
 import { ArrowDownRight, ArrowUpRight, MoreVertical } from 'lucide-react'
 
 interface Transaction {
+  /** Unique transaction identifier */
   id: string
+  /** Transaction name/description */
   name: string
+  /** Transaction category */
   category: string
+  /** Transaction amount */
   amount: number
+  /** Transaction date (relative time) */
   date: string
+  /** Transaction type */
   type: 'income' | 'expense'
 }
 
+/**
+ * Recent transactions component displaying a list of financial transactions.
+ * Shows transaction details with icons indicating income/expense,
+ * amounts, and action buttons for each transaction.
+ * 
+ * @returns JSX element containing the recent transactions list
+ */
 export default function RecentTransactions() {
   const transactions: Transaction[] = [
     {

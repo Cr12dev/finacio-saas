@@ -1,12 +1,23 @@
 import { AlertCircle, CheckCircle, Target } from 'lucide-react'
 
 interface Budget {
+  /** Budget category name */
   category: string
+  /** Amount spent */
   spent: number
+  /** Total budget amount */
   total: number
+  /** Gradient color class for the progress bar */
   color: string
 }
 
+/**
+ * Budget progress component tracking monthly spending by category.
+ * Displays progress bars for each budget category with over-budget
+ * warnings and remaining budget summary.
+ * 
+ * @returns JSX element containing the budget progress tracking
+ */
 export default function BudgetProgress() {
   const budgets: Budget[] = [
     { category: 'Food & Dining', spent: 450, total: 600, color: 'from-orange-500 to-orange-600' },

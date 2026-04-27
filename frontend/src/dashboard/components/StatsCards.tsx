@@ -1,13 +1,25 @@
 import { DollarSign, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 
 interface StatCardProps {
+  /** Title of the stat card */
   title: string
+  /** Value to display */
   value: string
+  /** Percentage change from previous period */
   change: string
+  /** Whether the change is positive */
   isPositive: boolean
+  /** Icon component to display */
   icon: React.ElementType
 }
 
+/**
+ * Individual stat card component displaying a financial metric.
+ * Shows title, value, change percentage with trend indicator, and icon.
+ * 
+ * @param props - Component props
+ * @returns JSX element containing the stat card
+ */
 function StatCard({ title, value, change, isPositive, icon: Icon }: StatCardProps) {
   return (
     <div className="bg-white rounded-2xl p-6 border-2 border-indigo-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-lg">
@@ -28,6 +40,13 @@ function StatCard({ title, value, change, isPositive, icon: Icon }: StatCardProp
   )
 }
 
+/**
+ * Stats cards component displaying key financial metrics.
+ * Shows total balance, monthly income, monthly expenses, and savings
+ * with trend indicators for each metric.
+ * 
+ * @returns JSX element containing a grid of stat cards
+ */
 export default function StatsCards() {
   const stats = [
     {

@@ -1,5 +1,12 @@
 import { BarChart3 } from 'lucide-react'
 
+/**
+ * Spending chart component displaying monthly spending overview.
+ * Shows a bar chart of spending over the last 6 months with
+ * total and average spending summaries.
+ * 
+ * @returns JSX element containing the spending chart
+ */
 export default function SpendingChart() {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
   const spending = [2800, 3200, 2900, 3500, 3100, 3280]

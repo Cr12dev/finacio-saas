@@ -1,5 +1,12 @@
 import { TrendingUp } from 'lucide-react'
 
+/**
+ * Footer component for the landing page.
+ * Displays the logo, navigation links, and copyright information.
+ * Responsive layout with two columns on desktop.
+ * 
+ * @returns JSX element containing the footer section
+ */
 function Footer() {
   return (
     <footer className="bg-white border-t border-indigo-100 rounded-t-3xl">

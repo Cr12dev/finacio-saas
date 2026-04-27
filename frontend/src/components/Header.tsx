@@ -3,6 +3,13 @@ import { TrendingUp } from 'lucide-react'
 import { useIsMobile } from '../../hooks/useMobileDevice'
 import { Button } from './ui/button'
 
+/**
+ * Header component for the landing page.
+ * Displays the logo, navigation links, and a call-to-action button.
+ * Responsive design shows/hides the brand name based on viewport size.
+ * 
+ * @returns JSX element containing the header navigation
+ */
 function Header() {
   const isMobile = useIsMobile()
 

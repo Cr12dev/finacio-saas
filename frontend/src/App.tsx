@@ -15,6 +15,12 @@ import Dashboard from './dashboard/Dashboard'
 import Panel from './dashboard/Panel'
 import Transactions from './dashboard/Transactions'
 
+/**
+ * Hero section component for the landing page.
+ * Displays the main headline, description, and call-to-action buttons.
+ * 
+ * @returns JSX element containing the hero section
+ */
 function Hero() {
   return (
     <section className="flex items-center justify-center min-h-screen max-w-6xl mx-auto px-4">
@@ -46,6 +52,13 @@ function Hero() {
   )
 }
 
+/**
+ * Features section component showcasing key product features.
+ * Displays expense monitoring, dashboard, and team chat features
+ * with responsive grid layout.
+ * 
+ * @returns JSX element containing the features section
+ */
 function Features() {
   const isMobile = useIsMobile()
   const [percentage, setPercentage] = useState(-12)
@@ -158,6 +171,13 @@ function Features() {
   )
 }
 
+/**
+ * Pricing section component displaying subscription plans.
+ * Shows Free and Pro plans with features and pricing.
+ * Responsive layout with grid on desktop and stack on mobile.
+ * 
+ * @returns JSX element containing the pricing section
+ */
 function Pricing() {
   const isMobile = useIsMobile()
 
@@ -250,6 +270,12 @@ function Pricing() {
   )
 }
 
+/**
+ * Call-to-action section component.
+ * Displays a final CTA encouraging users to sign up.
+ * 
+ * @returns JSX element containing the CTA section
+ */
 function CTA() {
   return (
     <section className="max-w-6xl mx-auto px-4 py-20">
@@ -281,6 +307,14 @@ const pruebaConsola = async () => {
   }
 }
 
+/**
+ * Main App component.
+ * Sets up routing for the application with React Router.
+ * Includes landing page sections (Hero, Features, Pricing, CTA)
+ * and authenticated routes (Dashboard, Transactions, Panel, Login, Register).
+ * 
+ * @returns JSX element containing the application routing
+ */
 function App() {
   useEffect(() => {
     pruebaConsola()

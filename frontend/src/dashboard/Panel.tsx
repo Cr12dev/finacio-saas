@@ -3,6 +3,14 @@ import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsMobile } from '../../hooks/useMobileDevice'
 
+/**
+ * Panel page component.
+ * Business management page displaying a list of businesses.
+ * Includes responsive sidebar with toggle functionality for mobile
+ * and an add button for creating new businesses.
+ * 
+ * @returns JSX element containing the panel layout
+ */
 export default function Panel() {
   const { isOpen, toggle, close } = useSidebar()
   const isMobile = useIsMobile()

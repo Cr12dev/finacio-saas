@@ -13,10 +13,22 @@ import { useEffect, useState } from 'react'
 import { useIsMobile } from '../../hooks/useMobileDevice'
 
 interface SlidebarProps {
+  /** Whether the sidebar is currently open (for mobile) */
   isOpen?: boolean
+  /** Callback function to close the sidebar */
   onClose?: () => void
 }
 
+/**
+ * Sidebar navigation component for dashboard pages.
+ * Displays navigation menu items, user info, and logout option.
+ * Responsive design: fixed with slide animation on mobile, static on desktop.
+ * 
+ * @param props - Component props
+ * @param props.isOpen - Whether sidebar is open (mobile only)
+ * @param props.onClose - Callback to close sidebar
+ * @returns JSX element containing the sidebar navigation
+ */
 export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
