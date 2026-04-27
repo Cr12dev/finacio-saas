@@ -7,12 +7,20 @@ import {
   TrendingUp,
   User,
   Wallet,
+  X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useIsMobile } from '../../hooks/useMobileDevice'
 
-export default function Slidebar() {
+interface SlidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const user = localStorage.getItem('user')
@@ -33,16 +41,46 @@ export default function Slidebar() {
   ]
 
   return (
-    <aside className="w-64 bg-white border-r border-indigo-100 min-h-screen flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-indigo-100 flex items-center gap-3">
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-xl">
-          <TrendingUp className="w-6 h-6 text-white" />
+    <>
+      {/* Mobile overlay */}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+      
+      <aside
+        className={`fixed lg:relative z-50 lg:z-auto bg-white border-r border-indigo-100 min-h-screen flex flex-col transition-transform duration-300 ease-in-out ${
+          isMobile
+            ? isOpen
+              ? 'translate-x-0'
+              : '-translate-x-full'
+            : 'translate-x-0'
+        } ${isMobile ? 'w-64' : 'w-64'}`}
+      >
+        {/* Logo */}
+        <div className="p-6 border-b border-indigo-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-xl">
+              <TrendingUp className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Finacio
+            </h1>
+          </div>
+          {isMobile && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-indigo-50 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          )}
         </div>
-        <h1 className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-          Finacio
-        </h1>
-      </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
@@ -84,6 +122,7 @@ export default function Slidebar() {
           <span className="font-medium">Logout</span>
         </a>
       </div>
-    </aside>
+      </aside>
+    </>
   )
 }
