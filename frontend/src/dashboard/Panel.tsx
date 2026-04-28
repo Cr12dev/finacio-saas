@@ -4,6 +4,7 @@ import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
 import api from '../lib/api'
+import useToast from '../../hooks/useToast'
 
 /**
  * Panel page component.
@@ -18,6 +19,7 @@ import api from '../lib/api'
 export default function Panel() {
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
+  const toast = useToast()
   const [businesses, setBusinesses] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -54,8 +56,10 @@ export default function Panel() {
       setNewBusinessName('')
       setShowModal(false)
       fetchBusinesses()
+      toast.success('Business created successfully')
     } catch (error) {
       console.error('Error creating business:', error)
+      toast.error('Failed to create business')
     }
   }
 
@@ -67,8 +71,10 @@ export default function Panel() {
       setSelectedBusinessId(null)
       setSelectedBusinessName('')
       fetchBusinesses()
+      toast.success('Business deleted successfully')
     } catch (error) {
       console.error('Error deleting business:', error)
+      toast.error('Failed to delete business')
     }
   }
   return (

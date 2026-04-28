@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 //HOOKS
 import { useIsMobile } from '../../hooks/useMobileDevice'
 import { Button } from '../components/ui/button'
+import useToast from '../../hooks/useToast'
 
 /**
  * Register page component.
@@ -17,6 +18,7 @@ import { Button } from '../components/ui/button'
  */
 export default function Register() {
   const isMobile = useIsMobile()
+  const toast = useToast()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -32,6 +34,7 @@ export default function Register() {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match')
+      toast.error('Passwords do not match')
       return
     }
 
@@ -50,11 +53,14 @@ export default function Register() {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
 
-      // Redirigir al home o dashboard
+      toast.success('Registration successful!')
+
+      // Redirigir al login
       navigate('/login')
     } catch (error: any) {
       console.error('Registration error:', error)
       setError(error.response?.data?.error || 'Error al registrar usuario')
+      toast.error(error.response?.data?.error || 'Error al registrar usuario')
     } finally {
       setLoading(false)
     }

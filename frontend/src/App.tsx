@@ -4,6 +4,8 @@ import axios from 'axios'
 import { ArrowRight, BarChart3, Check, MessageSquare, Star, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import { Button } from './components/ui/button'
@@ -342,6 +344,7 @@ function App() {
         <Route path="/:businessId/transactions" element={<Transactions />} />
         <Route path="/panel" element={<Panel />} />
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
   )
 }

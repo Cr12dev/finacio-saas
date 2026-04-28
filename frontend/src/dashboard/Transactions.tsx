@@ -7,6 +7,7 @@ import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
+import useToast from '../../hooks/useToast'
 
 /**
  * Transactions page component.
@@ -37,6 +38,7 @@ export default function Transactions() {
   const navigate = useNavigate()
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
+  const toast = useToast()
 
   useEffect(() => {
     if (!businessId) {
@@ -63,8 +65,10 @@ export default function Transactions() {
     try {
       await deleteTransaction(id)
       setTransactions(transactions.filter(t => t.id !== id))
+      toast.success('Transaction deleted successfully')
     } catch (err) {
       setError('Failed to delete transaction')
+      toast.error('Failed to delete transaction')
     }
   }
 
@@ -76,8 +80,9 @@ export default function Transactions() {
       setTransactions([...transactions, added])
       setShowAddModal(false)
       setNewTransaction({ description: '', amount: 0, type: 'expense', date: localdate })
+      toast.success('Transaction added successfully')
     } catch (err) {
-      setError('Failed to add transaction')
+      toast.error('Failed to add transaction')
     }
   }
 

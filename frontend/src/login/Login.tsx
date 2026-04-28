@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 //HOOKS
 import { useIsMobile } from '../../hooks/useMobileDevice'
 import { Button } from '../components/ui/button'
+import useToast from '../../hooks/useToast'
 
 /**
  * Login page component.
@@ -16,6 +17,7 @@ import { Button } from '../components/ui/button'
  */
 export default function Login() {
   const isMobile = useIsMobile()
+  const toast = useToast()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -40,11 +42,14 @@ export default function Login() {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
 
-      // Redirigir al home o dashboard
-      navigate('/dashboard')
+      toast.success('Login successful!')
+
+      // Redirigir al panel
+      navigate('/panel')
     } catch (error: any) {
       console.error('Login error:', error)
       setError(error.response?.data?.error || 'Error al iniciar sesión')
+      toast.error(error.response?.data?.error || 'Error al iniciar sesión')
     } finally {
       setLoading(false)
     }
