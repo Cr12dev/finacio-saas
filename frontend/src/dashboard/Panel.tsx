@@ -1,7 +1,9 @@
-import { Menu } from 'lucide-react'
+import { Menu, Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
+import api from '../lib/api'
 
 /**
  * Panel page component.
@@ -14,17 +16,38 @@ import { useIsTablet } from '../../hooks/useMobileDevice'
 export default function Panel() {
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
+  const [businesses, setBusinesses] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [newBusinessName, setNewBusinessName] = useState('')
 
-  const bussinesList = [
-    {
-      name: 'Business 1',
-      description: 'Description 1',
-    },
-    {
-      name: 'Business 2',
-      description: 'Description 2',
-    },
-  ]
+  useEffect(() => {
+    fetchBusinesses()
+  }, [])
+
+  const fetchBusinesses = async () => {
+    try {
+      const response = await api.get('/business')
+      setBusinesses(response.data)
+    } catch (error) {
+      console.error('Error fetching businesses:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCreateBusiness = async () => {
+    if (!newBusinessName.trim()) return
+
+    try {
+      await api.post('/business', { name: newBusinessName })
+      setNewBusinessName('')
+      setShowModal(false)
+      fetchBusinesses()
+    } catch (error) {
+      console.error('Error creating business:', error)
+    }
+  }
   return (
     <div>
       <div className="flex h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -53,9 +76,11 @@ export default function Panel() {
               <div className="flex items-center gap-4">
                 <button
                   type="button"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors"
+                  onClick={() => setShowModal(true)}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2"
                 >
-                  +
+                  <Plus className="w-5 h-5" />
+                  Add Business
                 </button>
                 <div className="text-right border-l border-indigo-200 pl-4">
                   <p className="text-sm text-gray-500">Last updated</p>
@@ -66,11 +91,15 @@ export default function Panel() {
 
             {/* Content placeholder */}
             <div className="space-y-4">
-              {bussinesList.length > 0 ? (
-                bussinesList.map((business, index) => (
-                  <div key={index} className="bg-white rounded-2xl p-6 border-2 border-indigo-100">
+              {loading ? (
+                <div className="bg-white rounded-2xl p-12 border-2 border-indigo-100 text-center">
+                  <p className="text-gray-500">Loading...</p>
+                </div>
+              ) : businesses.length > 0 ? (
+                businesses.map((business) => (
+                  <div key={business.id} className="bg-white rounded-2xl p-6 border-2 border-indigo-100">
                     <h2 className="text-xl font-bold text-gray-900">{business.name}</h2>
-                    <p className="text-gray-600 mt-2">{business.description}</p>
+                    <p className="text-gray-600 mt-2">Created: {new Date(business.created_at).toLocaleDateString()}</p>
                   </div>
                 ))
               ) : (
@@ -79,6 +108,38 @@ export default function Panel() {
                 </div>
               )}
             </div>
+
+            {/* Modal for creating business */}
+            {showModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Create New Business</h2>
+                  <input
+                    type="text"
+                    value={newBusinessName}
+                    onChange={(e) => setNewBusinessName(e.target.value)}
+                    placeholder="Business name"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors mb-4"
+                  />
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="flex-1 px-6 py-2.5 rounded-xl font-medium transition-colors border-2 border-indigo-200 text-gray-700 hover:bg-indigo-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCreateBusiness}
+                      className="flex-1 px-6 py-2.5 rounded-xl font-medium transition-colors bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                      Create
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>

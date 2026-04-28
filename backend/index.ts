@@ -6,9 +6,13 @@ import { app, port } from './config'
 import { supabase } from '../lib/supabase'
 import { hashPassword, comparePassword, generateToken } from './auth'
 import Transactions from './transactions/transactions'
+import Business from './business/business'
 
 // Registrar las rutas de transacciones
 Transactions()
+
+// Registrar las rutas de negocios
+Business()
 
 // Registro de usuario
 app.post('/api/register', async (req, res) => {

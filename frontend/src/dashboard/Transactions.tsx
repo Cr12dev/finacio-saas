@@ -53,12 +53,11 @@ export default function Transactions() {
   const isTablet = useIsTablet()
   const [isEditing, setIsEditing] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [newTransaction, setNewTransaction] = useState<{ description: string; amount: number; type: 'expense' | 'income'; date: string }>({ description: '', amount: 0, type: 'expense', date: '' })
-
-
-
   const [transactions, setTransactions] = useState<Array<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }>>([])
   const [error, setError] = useState<string | null>(null)
+
+  const localdate = new Date().toISOString().split('T')[0]
+  const [newTransaction, setNewTransaction] = useState<{ description: string; amount: number; type: 'expense' | 'income'; date: string }>({ description: '', amount: 0, type: 'expense', date: localdate })
 
   useEffect(() => {
     fetchTransactions()
@@ -82,7 +81,7 @@ export default function Transactions() {
       const added = await addTransaction(newTransaction)
       setTransactions([...transactions, added])
       setShowAddModal(false)
-      setNewTransaction({ description: '', amount: 0, type: 'expense', date: '' })
+      setNewTransaction({ description: '', amount: 0, type: 'expense', date: localdate })
     } catch (err) {
       setError('Failed to add transaction')
     }
@@ -203,7 +202,7 @@ export default function Transactions() {
                       type="button"
                       onClick={() => {
                         setShowAddModal(false)
-                        setNewTransaction({ description: '', amount: 0, type: 'expense', date: '' })
+                        setNewTransaction({ description: '', amount: 0, type: 'expense', date: localdate })
                       }}
                       className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors"
                     >
