@@ -2,7 +2,11 @@ import { BarChart3 } from 'lucide-react'
 
 interface SpendingChartProps {
   /** Array of transactions to calculate spending from */
-  transactions: any[]
+  transactions: Array<{
+    date: string
+    type: 'income' | 'expense'
+    amount: number
+  }>
 }
 
 /**

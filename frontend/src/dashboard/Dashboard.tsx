@@ -1,6 +1,6 @@
 import { Menu } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Slidebar from '../components/Slidebar'
 import BudgetProgress from './components/BudgetProgress'
 import RecentTransactions from './components/RecentTransactions'
@@ -23,8 +23,17 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
-  const [transactions, setTransactions] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [transactions, setTransactions] = useState<Array<{ id: string; description: string; amount: number; type: 'income' | 'expense'; date: string }>>([])
+
+  const fetchTransactions = useCallback(async () => {
+    if (!businessId) return
+    try {
+      const response = await api.get(`/transactions?business_id=${businessId}`)
+      setTransactions(response.data)
+    } catch (error) {
+      console.error('Error fetching transactions:', error)
+    }
+  }, [businessId])
 
   useEffect(() => {
     if (!businessId) {
@@ -32,19 +41,8 @@ export default function Dashboard() {
       return
     }
     fetchTransactions()
-  }, [businessId, navigate])
-
-  const fetchTransactions = async () => {
-    if (!businessId) return
-    try {
-      const response = await api.get(`/transactions?business_id=${businessId}`)
-      setTransactions(response.data)
-    } catch (error) {
-      console.error('Error fetching transactions:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+  }, [businessId, navigate, fetchTransactions])
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 to-purple-50">

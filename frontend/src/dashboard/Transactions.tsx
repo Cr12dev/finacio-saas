@@ -66,7 +66,7 @@ export default function Transactions() {
       await deleteTransaction(id)
       setTransactions(transactions.filter(t => t.id !== id))
       toast.success('Transaction deleted successfully')
-    } catch (err) {
+    } catch {
       setError('Failed to delete transaction')
       toast.error('Failed to delete transaction')
     }
@@ -81,7 +81,7 @@ export default function Transactions() {
       setShowAddModal(false)
       setNewTransaction({ description: '', amount: 0, type: 'expense', date: localdate })
       toast.success('Transaction added successfully')
-    } catch (err) {
+    } catch {
       toast.error('Failed to add transaction')
     }
   }

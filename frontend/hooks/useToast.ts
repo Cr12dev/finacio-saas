@@ -2,17 +2,6 @@ import { toast, ToastOptions } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const useToast = () => {
-    const options: ToastOptions = {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-    };
-    
   return {
     success: (message: string, options?: ToastOptions) => {
       toast.success(message, options);

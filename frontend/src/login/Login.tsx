@@ -46,10 +46,11 @@ export default function Login() {
 
       // Redirigir al panel
       navigate('/panel')
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error)
-      setError(error.response?.data?.error || 'Error al iniciar sesión')
-      toast.error(error.response?.data?.error || 'Error al iniciar sesión')
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al iniciar sesión'
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }

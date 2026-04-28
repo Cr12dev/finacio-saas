@@ -1,23 +1,14 @@
 import { ArrowDownRight, ArrowUpRight, MoreVertical } from 'lucide-react'
 
-interface Transaction {
-  /** Unique transaction identifier */
-  id: string
-  /** Transaction name/description */
-  name: string
-  /** Transaction category */
-  category: string
-  /** Transaction amount */
-  amount: number
-  /** Transaction date (relative time) */
-  date: string
-  /** Transaction type */
-  type: 'income' | 'expense'
-}
-
 interface RecentTransactionsProps {
   /** Array of transactions to display */
-  transactions: any[]
+  transactions: Array<{
+    id: string
+    description: string
+    amount: number
+    date: string
+    type: 'income' | 'expense'
+  }>
 }
 
 /**

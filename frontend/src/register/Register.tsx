@@ -57,10 +57,11 @@ export default function Register() {
 
       // Redirigir al login
       navigate('/login')
-    } catch (error: any) {
+    } catch (error) {
       console.error('Registration error:', error)
-      setError(error.response?.data?.error || 'Error al registrar usuario')
-      toast.error(error.response?.data?.error || 'Error al registrar usuario')
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al registrar usuario'
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }

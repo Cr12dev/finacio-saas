@@ -1,5 +1,5 @@
 import { Menu, Plus, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
@@ -20,7 +20,7 @@ export default function Panel() {
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
   const toast = useToast()
-  const [businesses, setBusinesses] = useState<any[]>([])
+  const [businesses, setBusinesses] = useState<Array<{ id: string; name: string; created_at: string }>>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -31,13 +31,7 @@ export default function Panel() {
   const [selectedBusinessName, setSelectedBusinessName] = useState<string>('')
   const [deleteConfirmation, setDeleteConfirmation] = useState<string>('')
 
-
-
-  useEffect(() => {
-    fetchBusinesses()
-  }, [])
-
-  const fetchBusinesses = async () => {
+  const fetchBusinesses = useCallback(async () => {
     try {
       const response = await api.get('/business')
       setBusinesses(response.data)
@@ -46,7 +40,12 @@ export default function Panel() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchBusinesses()
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+  }, [fetchBusinesses])
 
   const handleCreateBusiness = async () => {
     if (!newBusinessName.trim()) return

@@ -1,17 +1,17 @@
 import {
-  BarChart3,
   Home,
-  LogOut,
   PanelLeft,
   Settings,
-  TrendingUp,
-  User,
   Wallet,
+  BarChart3,
+  TrendingUp,
+  LogOut,
+  User,
   X,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useIsTablet } from '../../hooks/useMobileDevice'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
+import { useIsTablet } from '../../hooks/useMobileDevice'
 
 interface SlidebarProps {
   /** Whether the sidebar is currently open (for mobile and tablet) */
@@ -30,13 +30,13 @@ interface SlidebarProps {
  * @param props.onClose - Callback to close sidebar
  * @returns JSX element containing the sidebar navigation
  */
-export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
+export default function Slidebar({ isOpen, onClose }: SlidebarProps) {
+  const isTablet = useIsTablet()
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
-  const isTablet = useIsTablet()
   const { businessId } = useParams()
 
-  useEffect(() => {
+  const loadUserData = useCallback(() => {
     const user = localStorage.getItem('user')
     if (user) {
       const userData = JSON.parse(user)
@@ -44,6 +44,11 @@ export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
       setUserEmail(userData.email || '')
     }
   }, [])
+
+  useEffect(() => {
+    loadUserData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+  }, [loadUserData])
 
   const menuItems = [
     { label: 'Panel', href: '/panel', icon: PanelLeft },

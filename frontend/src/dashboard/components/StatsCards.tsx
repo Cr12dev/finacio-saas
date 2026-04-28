@@ -15,7 +15,11 @@ interface StatCardProps {
 
 interface StatsCardsProps {
   /** Array of transactions to calculate stats from */
-  transactions: any[]
+  transactions: Array<{
+    type: 'income' | 'expense'
+    amount: number
+    date: string
+  }>
 }
 
 /**
