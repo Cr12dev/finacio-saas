@@ -73,4 +73,39 @@ export default function Business() {
         }
     })
 
+    app.delete('/api/business/:id', async (req, res) => {
+        try {
+            const token = req.headers.authorization?.replace('Bearer ', '')
+            
+            if (!token) {
+                return res.status(401).json({ error: 'Token no proporcionado' })
+            }
+
+            const decoded = verifyToken(token)
+            if (!decoded) {
+                return res.status(401).json({ error: 'Token inválido' })
+            }
+
+            const { id } = req.params
+
+            const { data: business, error } = await supabase
+              .from('business')
+              .delete()
+              .eq('id', id)
+              .eq('user_id', decoded.userId)
+              .select()
+              .single()
+            
+            if (error) {
+              console.error('Error al eliminar negocio:', error)
+              return res.status(500).json({ error: 'Error al eliminar negocio' })
+            }
+            
+            res.status(200).json({ message: 'Negocio eliminado correctamente' })
+        } catch (error) {
+            console.error('Error en eliminación de negocio:', error)
+            res.status(500).json({ error: 'Error interno del servidor' })
+        }
+    })
+
 }

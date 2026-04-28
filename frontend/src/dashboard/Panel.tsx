@@ -1,4 +1,4 @@
-import { Menu, Plus } from 'lucide-react'
+import { Menu, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
@@ -13,6 +13,8 @@ import api from '../lib/api'
  * 
  * @returns JSX element containing the panel layout
  */
+
+
 export default function Panel() {
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
@@ -20,6 +22,8 @@ export default function Panel() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [newBusinessName, setNewBusinessName] = useState('')
+
+
 
   useEffect(() => {
     fetchBusinesses()
@@ -46,6 +50,15 @@ export default function Panel() {
       fetchBusinesses()
     } catch (error) {
       console.error('Error creating business:', error)
+    }
+  }
+
+  const handleDeleteBusiness = async (id: string) => {
+    try {
+      await api.delete(`/business/${id}`)
+      fetchBusinesses()
+    } catch (error) {
+      console.error('Error deleting business:', error)
     }
   }
   return (
@@ -97,9 +110,19 @@ export default function Panel() {
                 </div>
               ) : businesses.length > 0 ? (
                 businesses.map((business) => (
-                  <div key={business.id} className="bg-white rounded-2xl p-6 border-2 border-indigo-100">
-                    <h2 className="text-xl font-bold text-gray-900">{business.name}</h2>
-                    <p className="text-gray-600 mt-2">Created: {new Date(business.created_at).toLocaleDateString()}</p>
+                  <div key={business.id} className="bg-white rounded-2xl p-6 border-2 border-indigo-100 flex items-center justify-between">
+                    <div>
+                      <a href={`/${business.id}/dashboard`} className="text-xl font-bold text-gray-900">{business.name}</a>
+                      <p className="text-gray-600 mt-2">Created: {new Date(business.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteBusiness(business.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mt-4"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                    
                   </div>
                 ))
               ) : (

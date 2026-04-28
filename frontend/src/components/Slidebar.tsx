@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useIsTablet } from '../../hooks/useMobileDevice'
+import { useParams } from 'react-router-dom'
 
 interface SlidebarProps {
   /** Whether the sidebar is currently open (for mobile and tablet) */
@@ -33,6 +34,7 @@ export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
   const isTablet = useIsTablet()
+  const { businessId } = useParams()
 
   useEffect(() => {
     const user = localStorage.getItem('user')
@@ -45,11 +47,11 @@ export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
 
   const menuItems = [
     { label: 'Panel', href: '/panel', icon: PanelLeft },
-    { icon: Home, label: 'Dashboard', href: '/dashboard' },
-    { icon: Wallet, label: 'Transactions', href: '/transactions' },
-    { icon: BarChart3, label: 'Analytics', href: '/analytics' },
-    { icon: TrendingUp, label: 'Investments', href: '/investments' },
-    { icon: Settings, label: 'Settings', href: '/settings' },
+    { icon: Home, label: 'Dashboard', href: businessId ? `/${businessId}/dashboard` : '/dashboard' },
+    { icon: Wallet, label: 'Transactions', href: businessId ? `/${businessId}/transactions` : '/transactions' },
+    { icon: BarChart3, label: 'Analytics', href: businessId ? `/${businessId}/analytics` : '/analytics' },
+    { icon: TrendingUp, label: 'Investments', href: businessId ? `/${businessId}/investments` : '/investments' },
+    { icon: Settings, label: 'Settings', href: businessId ? `/${businessId}/settings` : '/settings' },
   ]
 
   return (

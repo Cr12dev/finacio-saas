@@ -1,4 +1,5 @@
 import { Menu } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 import Slidebar from '../components/Slidebar'
 import BudgetProgress from './components/BudgetProgress'
 import RecentTransactions from './components/RecentTransactions'
@@ -16,6 +17,7 @@ import { useIsTablet } from '../../hooks/useMobileDevice'
  * @returns JSX element containing the dashboard layout
  */
 export default function Dashboard() {
+  const { businessId } = useParams()
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
 

@@ -1,10 +1,12 @@
 "use client"
 
 import { ArrowDownRight, ArrowUpRight, Menu, Plus, Trash2 } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
 import { useState, useEffect } from 'react'
+import api from '../lib/api'
 
 /**
  * Transactions page component.
@@ -15,40 +17,23 @@ import { useState, useEffect } from 'react'
  */
 
 
-async function fetchTransactions(): Promise<Array<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }>> {
-  const response = await fetch('/api/transactions')
-  if (!response.ok) {
-    throw new Error('Failed to fetch transactions')
-  }
-  const data = await response.json()
-  return data
+async function fetchTransactions(businessId: string): Promise<Array<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }>> {
+  const response = await api.get(`/transactions?business_id=${businessId}`)
+  return response.data
 }
 
 async function deleteTransaction(id: number): Promise<void> {
-  const response = await fetch(`/api/transactions/${id}`, {
-    method: 'DELETE'
-  })
-  if (!response.ok) {
-    throw new Error('Failed to delete transaction')
-  }
+  await api.delete(`/transactions/${id}`)
 }
 
-async function addTransaction(transaction: { description: string; amount: number; type: 'expense' | 'income'; date: string }): Promise<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }> {
-  const response = await fetch('/api/transactions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(transaction),
-  })
-  if (!response.ok) {
-    throw new Error('Failed to add transaction')
-  }
-  return await response.json()
+async function addTransaction(transaction: { description: string; amount: number; type: 'expense' | 'income'; date: string; business_id: string }): Promise<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }> {
+  const response = await api.post('/transactions', transaction)
+  return response.data
 }
 
 
 export default function Transactions() {
+  const { businessId } = useParams()
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
   const [isEditing, setIsEditing] = useState(false)
@@ -60,11 +45,12 @@ export default function Transactions() {
   const [newTransaction, setNewTransaction] = useState<{ description: string; amount: number; type: 'expense' | 'income'; date: string }>({ description: '', amount: 0, type: 'expense', date: localdate })
 
   useEffect(() => {
-    fetchTransactions()
-      .then(setTransactions)
-      .catch((err) => setError(err.message))
-    
-  }, [])
+    if (businessId) {
+      fetchTransactions(businessId)
+        .then(setTransactions)
+        .catch((err) => setError(err.message))
+    }
+  }, [businessId])
 
   const handleDelete = async (id: number) => {
     try {
@@ -77,8 +63,9 @@ export default function Transactions() {
 
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!businessId) return
     try {
-      const added = await addTransaction(newTransaction)
+      const added = await addTransaction({ ...newTransaction, business_id: businessId })
       setTransactions([...transactions, added])
       setShowAddModal(false)
       setNewTransaction({ description: '', amount: 0, type: 'expense', date: localdate })

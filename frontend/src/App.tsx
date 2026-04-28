@@ -338,8 +338,8 @@ function App() {
         />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/transactions" element={<Transactions />} />
+        <Route path="/:businessId/dashboard" element={<Dashboard />} />
+        <Route path="/:businessId/transactions" element={<Transactions />} />
         <Route path="/panel" element={<Panel />} />
       </Routes>
     </BrowserRouter>
