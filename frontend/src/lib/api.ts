@@ -18,4 +18,9 @@ api.interceptors.request.use(
   }
 )
 
+export const updateTransaction = async (id: string, data: { description: string; amount: number; date: string; category?: string; type: 'income' | 'expense' }) => {
+  const response = await api.put(`/transactions/${id}`, data)
+  return response.data
+}
+
 export default api

@@ -1,12 +1,12 @@
 "use client"
 
-import { ArrowDownRight, ArrowUpRight, Menu, Plus, Trash2 } from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, Menu, Plus, Trash2, Edit } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
 import { useState, useEffect } from 'react'
-import api from '../lib/api'
+import api, { updateTransaction } from '../lib/api'
 import useToast from '../../hooks/useToast'
 
 /**
@@ -47,11 +47,14 @@ export default function Transactions() {
   }, [businessId, navigate])
   const [isEditing, setIsEditing] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [transactions, setTransactions] = useState<Array<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }>>([])
   const [error, setError] = useState<string | null>(null)
+  const [editingTransaction, setEditingTransaction] = useState<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string } | null>(null)
 
   const localdate = new Date().toISOString().split('T')[0]
   const [newTransaction, setNewTransaction] = useState<{ description: string; amount: number; type: 'expense' | 'income'; date: string }>({ description: '', amount: 0, type: 'expense', date: localdate })
+  const [editTransactionData, setEditTransactionData] = useState<{ description: string; amount: number; type: 'expense' | 'income'; date: string }>({ description: '', amount: 0, type: 'expense', date: localdate })
 
   useEffect(() => {
     if (businessId) {
@@ -83,6 +86,31 @@ export default function Transactions() {
       toast.success('Transaction added successfully')
     } catch {
       toast.error('Failed to add transaction')
+    }
+  }
+
+  const handleEditClick = (transaction: { id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }) => {
+    setEditingTransaction(transaction)
+    setEditTransactionData({
+      description: transaction.description,
+      amount: transaction.amount,
+      type: transaction.type,
+      date: transaction.date
+    })
+    setShowEditModal(true)
+  }
+
+  const handleUpdateTransaction = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingTransaction) return
+    try {
+      await updateTransaction(editingTransaction.id.toString(), editTransactionData)
+      setTransactions(transactions.map(t => t.id === editingTransaction.id ? { ...t, ...editTransactionData } : t))
+      setShowEditModal(false)
+      setEditingTransaction(null)
+      toast.success('Transaction updated successfully')
+    } catch {
+      toast.error('Failed to update transaction')
     }
   }
 
@@ -219,6 +247,90 @@ export default function Transactions() {
             </div>
           )}
 
+          {/* Edit Transaction Modal */}
+          {showEditModal && editingTransaction && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Edit Transaction</h2>
+                <form onSubmit={handleUpdateTransaction} className="space-y-4">
+                  <div>
+                    <label htmlFor="edit-description" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <input
+                      id="edit-description"
+                      type="text"
+                      value={editTransactionData.description}
+                      onChange={(e) => setEditTransactionData({ ...editTransactionData, description: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                      placeholder="Enter description"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-amount" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Amount
+                    </label>
+                    <input
+                      id="edit-amount"
+                      type="number"
+                      value={editTransactionData.amount}
+                      onChange={(e) => setEditTransactionData({ ...editTransactionData, amount: parseFloat(e.target.value) || 0 })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                      placeholder="Enter amount"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-type" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Type
+                    </label>
+                    <select
+                      id="edit-type"
+                      value={editTransactionData.type}
+                      onChange={(e) => setEditTransactionData({ ...editTransactionData, type: e.target.value as 'expense' | 'income' })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                    >
+                      <option value="expense">Expense</option>
+                      <option value="income">Income</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="edit-date" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Date
+                    </label>
+                    <input
+                      id="edit-date"
+                      type="date"
+                      value={editTransactionData.date}
+                      onChange={(e) => setEditTransactionData({ ...editTransactionData, date: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowEditModal(false)
+                        setEditingTransaction(null)
+                      }}
+                      className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+                    >
+                      Update Transaction
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
           {/* Content placeholder */}
           <div className="bg-white rounded-2xl p-12 border-2 border-indigo-100 text-left">
             {error ? (
@@ -251,13 +363,22 @@ export default function Transactions() {
                         {transaction.type === 'income' ? '+' : '-'}${transaction.amount}
                       </p>
                       {isEditing && (
-                        <button 
-                          onClick={() => handleDelete(transaction.id)}
-                          className="ml-2 p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                          aria-label="Delete transaction"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleEditClick(transaction)}
+                            className="ml-2 p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                            aria-label="Edit transaction"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(transaction.id)}
+                            className="ml-2 p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                            aria-label="Delete transaction"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
