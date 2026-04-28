@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowDownRight, ArrowUpRight, Menu } from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, Menu, Plus, Trash2 } from 'lucide-react'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
@@ -24,9 +24,36 @@ async function fetchTransactions(): Promise<Array<{ id: number; description: str
   return data
 }
 
+async function deleteTransaction(id: number): Promise<void> {
+  const response = await fetch(`/api/transactions/${id}`, {
+    method: 'DELETE'
+  })
+  if (!response.ok) {
+    throw new Error('Failed to delete transaction')
+  }
+}
+
+async function addTransaction(transaction: { description: string; amount: number; type: 'expense' | 'income'; date: string }): Promise<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }> {
+  const response = await fetch('/api/transactions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(transaction),
+  })
+  if (!response.ok) {
+    throw new Error('Failed to add transaction')
+  }
+  return await response.json()
+}
+
+
 export default function Transactions() {
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
+  const [isEditing, setIsEditing] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [newTransaction, setNewTransaction] = useState<{ description: string; amount: number; type: 'expense' | 'income'; date: string }>({ description: '', amount: 0, type: 'expense', date: '' })
 
 
 
@@ -37,7 +64,29 @@ export default function Transactions() {
     fetchTransactions()
       .then(setTransactions)
       .catch((err) => setError(err.message))
+    
   }, [])
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteTransaction(id)
+      setTransactions(transactions.filter(t => t.id !== id))
+    } catch (err) {
+      setError('Failed to delete transaction')
+    }
+  }
+
+  const handleAddTransaction = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const added = await addTransaction(newTransaction)
+      setTransactions([...transactions, added])
+      setShowAddModal(false)
+      setNewTransaction({ description: '', amount: 0, type: 'expense', date: '' })
+    } catch (err) {
+      setError('Failed to add transaction')
+    }
+  }
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -57,8 +106,28 @@ export default function Transactions() {
                   <Menu className="w-6 h-6 text-gray-600" />
                 </button>
               )}
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
+              <div className='flex flex-col'>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
+                  <button 
+                    onClick={() => setIsEditing(!isEditing)}
+                    className="px-4 py-2 mt-2 ml-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    {isEditing ? 'Save' : 'Edit'}
+                  </button>
+                  {isEditing && (
+                    <div className="flex items-center gap-2">
+                      <button 
+                      onClick={() => setShowAddModal(true)}
+                      className="px-4 py-2 mt-2 ml-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add
+                    </button>
+                    </div>
+                  )}
+                </div>
                 <p className="text-gray-600 mt-1">View and manage all your transactions.</p>
               </div>
             </div>
@@ -67,6 +136,90 @@ export default function Transactions() {
               <p className="font-semibold text-gray-900">Today, 4:30 PM</p>
             </div>
           </div>
+
+          {/* Add Transaction Modal */}
+          {showAddModal && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Add Transaction</h2>
+                <form onSubmit={handleAddTransaction} className="space-y-4">
+                  <div>
+                    <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <input
+                      id="description"
+                      type="text"
+                      value={newTransaction.description}
+                      onChange={(e) => setNewTransaction({ ...newTransaction, description: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                      placeholder="Enter description"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="amount" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Amount
+                    </label>
+                    <input
+                      id="amount"
+                      type="number"
+                      value={newTransaction.amount}
+                      onChange={(e) => setNewTransaction({ ...newTransaction, amount: parseFloat(e.target.value) || 0 })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                      placeholder="Enter amount"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="type" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Type
+                    </label>
+                    <select
+                      id="type"
+                      value={newTransaction.type}
+                      onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value as 'expense' | 'income' })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                    >
+                      <option value="expense">Expense</option>
+                      <option value="income">Income</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="date" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Date
+                    </label>
+                    <input
+                      id="date"
+                      type="date"
+                      value={newTransaction.date}
+                      onChange={(e) => setNewTransaction({ ...newTransaction, date: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors"
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddModal(false)
+                        setNewTransaction({ description: '', amount: 0, type: 'expense', date: '' })
+                      }}
+                      className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+                    >
+                      Add Transaction
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* Content placeholder */}
           <div className="bg-white rounded-2xl p-12 border-2 border-indigo-100 text-left">
@@ -95,9 +248,20 @@ export default function Transactions() {
                         <p className="text-gray-600">{transaction.type}</p>
                       </div>
                     </div>
-                    <p className={`text-gray-600 mt-2 text-lg ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                      {transaction.type === 'income' ? '+' : '-'}${transaction.amount}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className={`text-gray-600 mt-2 text-lg ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                        {transaction.type === 'income' ? '+' : '-'}${transaction.amount}
+                      </p>
+                      {isEditing && (
+                        <button 
+                          onClick={() => handleDelete(transaction.id)}
+                          className="ml-2 p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                          aria-label="Delete transaction"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   
                 </div>
