@@ -1,7 +1,7 @@
-import { Menu } from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, Menu } from 'lucide-react'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
-import { useIsMobile } from '../../hooks/useMobileDevice'
+import { useIsTablet } from '../../hooks/useMobileDevice'
 
 /**
  * Transactions page component.
@@ -12,7 +12,24 @@ import { useIsMobile } from '../../hooks/useMobileDevice'
  */
 export default function Transactions() {
   const { isOpen, toggle, close } = useSidebar()
-  const isMobile = useIsMobile()
+  const isTablet = useIsTablet()
+
+  const transactions = [
+    {
+      id: 1,
+      description: 'Grocery shopping',
+      amount: 100,
+      type: 'expense',
+      date: '2025-10-13',
+    },
+    {
+      id: 2,
+      description: 'Electricity bill',
+      amount: 200,
+      type: 'income',
+      date: '2025-10-13',
+    },
+  ]
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -22,7 +39,7 @@ export default function Transactions() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {isMobile && (
+              {isTablet && (
                 <button
                   type="button"
                   onClick={toggle}
@@ -44,8 +61,40 @@ export default function Transactions() {
           </div>
 
           {/* Content placeholder */}
-          <div className="bg-white rounded-2xl p-12 border-2 border-indigo-100 text-center">
-            <p className="text-gray-500">Transactions page content coming soon...</p>
+          <div className="bg-white rounded-2xl p-12 border-2 border-indigo-100 text-left">
+            {transactions.length > 0 ? (
+              transactions.map((transaction, index) => (
+                <div key={index} className="bg-white rounded-2xl p-6 border-indigo-100 flex items-center">
+                  <div
+                    className={`p-3 rounded-xl ${
+                      transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
+                    }`}
+                  >
+                    {transaction.type === 'income' ? (
+                      <ArrowUpRight className="w-5 h-5 text-green-600" />
+                    ) : (
+                      <ArrowDownRight className="w-5 h-5 text-red-600 -scale-x-100" />
+                    )}
+                  </div>
+                  <div className="ml-4 flex justify-between w-full">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">{transaction.description}</h2>
+                      <div className="flex items-center gap-2">
+                        <p className="text-gray-600">{transaction.date}</p>
+                        <p className="text-gray-600">•</p>
+                        <p className="text-gray-600">{transaction.type}</p>
+                      </div>
+                    </div>
+                    <p className={`text-gray-600 mt-2 text-lg ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      {transaction.type === 'income' ? '+' : '-'}${transaction.amount}
+                    </p>
+                  </div>
+                  
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No transactions found</p>
+            )}
           </div>
         </div>
       </main>

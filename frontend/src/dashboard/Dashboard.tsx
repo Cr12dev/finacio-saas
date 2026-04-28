@@ -5,7 +5,7 @@ import RecentTransactions from './components/RecentTransactions'
 import SpendingChart from './components/SpendingChart'
 import StatsCards from './components/StatsCards'
 import { useSidebar } from '../../hooks/useSidebar'
-import { useIsMobile } from '../../hooks/useMobileDevice'
+import { useIsTablet } from '../../hooks/useMobileDevice'
 
 /**
  * Dashboard page component.
@@ -17,7 +17,7 @@ import { useIsMobile } from '../../hooks/useMobileDevice'
  */
 export default function Dashboard() {
   const { isOpen, toggle, close } = useSidebar()
-  const isMobile = useIsMobile()
+  const isTablet = useIsTablet()
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -27,7 +27,7 @@ export default function Dashboard() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {isMobile && (
+              {isTablet && (
                 <button
                   type="button"
                   onClick={toggle}

@@ -1,7 +1,7 @@
 import { Menu } from 'lucide-react'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
-import { useIsMobile } from '../../hooks/useMobileDevice'
+import { useIsTablet } from '../../hooks/useMobileDevice'
 
 /**
  * Panel page component.
@@ -13,7 +13,7 @@ import { useIsMobile } from '../../hooks/useMobileDevice'
  */
 export default function Panel() {
   const { isOpen, toggle, close } = useSidebar()
-  const isMobile = useIsMobile()
+  const isTablet = useIsTablet()
 
   const bussinesList = [
     {
@@ -34,7 +34,7 @@ export default function Panel() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {isMobile && (
+                {isTablet && (
                   <button
                     type="button"
                     onClick={toggle}

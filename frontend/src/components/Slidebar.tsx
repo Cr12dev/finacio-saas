@@ -10,10 +10,10 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useIsMobile } from '../../hooks/useMobileDevice'
+import { useIsTablet } from '../../hooks/useMobileDevice'
 
 interface SlidebarProps {
-  /** Whether the sidebar is currently open (for mobile) */
+  /** Whether the sidebar is currently open (for mobile and tablet) */
   isOpen?: boolean
   /** Callback function to close the sidebar */
   onClose?: () => void
@@ -22,17 +22,17 @@ interface SlidebarProps {
 /**
  * Sidebar navigation component for dashboard pages.
  * Displays navigation menu items, user info, and logout option.
- * Responsive design: fixed with slide animation on mobile, static on desktop.
+ * Responsive design: fixed with slide animation on mobile and tablet, static on desktop.
  * 
  * @param props - Component props
- * @param props.isOpen - Whether sidebar is open (mobile only)
+ * @param props.isOpen - Whether sidebar is open (mobile and tablet)
  * @param props.onClose - Callback to close sidebar
  * @returns JSX element containing the sidebar navigation
  */
 export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
-  const isMobile = useIsMobile()
+  const isTablet = useIsTablet()
 
   useEffect(() => {
     const user = localStorage.getItem('user')
@@ -54,8 +54,8 @@ export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
 
   return (
     <>
-      {/* Mobile overlay */}
-      {isMobile && isOpen && (
+      {/* Mobile and tablet overlay */}
+      {isTablet && isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
@@ -65,12 +65,12 @@ export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
       
       <aside
         className={`fixed lg:relative z-50 lg:z-auto bg-white border-r border-indigo-100 min-h-screen flex flex-col transition-transform duration-300 ease-in-out ${
-          isMobile
+          isTablet
             ? isOpen
               ? 'translate-x-0'
               : '-translate-x-full'
             : 'translate-x-0'
-        } ${isMobile ? 'w-64' : 'w-64'}`}
+        } ${isTablet ? 'w-64' : 'w-64'}`}
       >
         {/* Logo */}
         <div className="p-6 border-b border-indigo-100 flex items-center justify-between">
@@ -82,7 +82,7 @@ export default function Slidebar({ isOpen = true, onClose }: SlidebarProps) {
               Finacio
             </h1>
           </div>
-          {isMobile && (
+          {isTablet && (
             <button
               type="button"
               onClick={onClose}
