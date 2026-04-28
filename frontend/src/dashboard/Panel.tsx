@@ -21,7 +21,13 @@ export default function Panel() {
   const [businesses, setBusinesses] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [newBusinessName, setNewBusinessName] = useState('')
+
+  //ModalHandleDelete
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null)
+  const [selectedBusinessName, setSelectedBusinessName] = useState<string>('')
+  const [deleteConfirmation, setDeleteConfirmation] = useState<string>('')
 
 
 
@@ -56,6 +62,10 @@ export default function Panel() {
   const handleDeleteBusiness = async (id: string) => {
     try {
       await api.delete(`/business/${id}`)
+      setShowDeleteModal(false)
+      setDeleteConfirmation('')
+      setSelectedBusinessId(null)
+      setSelectedBusinessName('')
       fetchBusinesses()
     } catch (error) {
       console.error('Error deleting business:', error)
@@ -117,7 +127,12 @@ export default function Panel() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleDeleteBusiness(business.id)}
+                      onClick={() => {
+                        setSelectedBusinessId(business.id)
+                        setSelectedBusinessName(business.name)
+                        setDeleteConfirmation('')
+                        setShowDeleteModal(true)
+                      }}
                       className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mt-4"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -158,6 +173,55 @@ export default function Panel() {
                       className="flex-1 px-6 py-2.5 rounded-xl font-medium transition-colors bg-indigo-600 text-white hover:bg-indigo-700"
                     >
                       Create
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Modal for deleting business */}
+            {showDeleteModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Delete Business</h2>
+                  <p className="text-gray-600 mb-2">This action cannot be undone.</p>
+                  <p className="text-gray-700 mb-4">Type <span className="font-bold text-red-600">{selectedBusinessName}</span> to confirm:</p>
+                  <input
+                    type="text"
+                    value={deleteConfirmation}
+                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                    placeholder="Business name"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:outline-none transition-colors mb-4"
+                  />
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowDeleteModal(false)
+                        setDeleteConfirmation('')
+                        setSelectedBusinessId(null)
+                        setSelectedBusinessName('')
+                      }}
+                      className="flex-1 px-6 py-2.5 rounded-xl font-medium transition-colors border-2 border-indigo-200 text-gray-700 hover:bg-indigo-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (deleteConfirmation !== selectedBusinessName || !selectedBusinessId) {
+                          return
+                        }
+                        handleDeleteBusiness(selectedBusinessId)
+                      }}
+                      disabled={deleteConfirmation !== selectedBusinessName}
+                      className={`flex-1 px-6 py-2.5 rounded-xl font-medium transition-colors ${
+                        deleteConfirmation === selectedBusinessName
+                          ? 'bg-red-600 text-white hover:bg-red-700'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      Delete
                     </button>
                   </div>
                 </div>

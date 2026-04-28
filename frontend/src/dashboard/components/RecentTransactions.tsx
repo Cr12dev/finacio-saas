@@ -15,56 +15,40 @@ interface Transaction {
   type: 'income' | 'expense'
 }
 
+interface RecentTransactionsProps {
+  /** Array of transactions to display */
+  transactions: any[]
+}
+
 /**
  * Recent transactions component displaying a list of financial transactions.
  * Shows transaction details with icons indicating income/expense,
  * amounts, and action buttons for each transaction.
  * 
+ * @param props - Component props
  * @returns JSX element containing the recent transactions list
  */
-export default function RecentTransactions() {
-  const transactions: Transaction[] = [
-    {
-      id: '1',
-      name: 'Salary Deposit',
-      category: 'Income',
-      amount: 5400,
-      date: 'Today',
-      type: 'income',
-    },
-    {
-      id: '2',
-      name: 'Netflix Subscription',
-      category: 'Entertainment',
-      amount: 15.99,
-      date: 'Today',
-      type: 'expense',
-    },
-    {
-      id: '3',
-      name: 'Grocery Store',
-      category: 'Food',
-      amount: 156.5,
-      date: 'Yesterday',
-      type: 'expense',
-    },
-    {
-      id: '4',
-      name: 'Freelance Payment',
-      category: 'Income',
-      amount: 1200,
-      date: 'Yesterday',
-      type: 'income',
-    },
-    {
-      id: '5',
-      name: 'Electric Bill',
-      category: 'Utilities',
-      amount: 89.0,
-      date: '2 days ago',
-      type: 'expense',
-    },
-  ]
+export default function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  const formatRelativeDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 0) return 'Today'
+    if (diffDays === 1) return 'Yesterday'
+    if (diffDays < 7) return `${diffDays} days ago`
+    return date.toLocaleDateString()
+  }
+
+  const formattedTransactions = transactions.slice(0, 5).map((t) => ({
+    id: t.id,
+    name: t.description,
+    category: t.type === 'income' ? 'Income' : 'Expense',
+    amount: t.amount,
+    date: formatRelativeDate(t.date),
+    type: t.type,
+  }))
 
   return (
     <div className="bg-white rounded-2xl p-6 border-2 border-indigo-100">
@@ -76,7 +60,8 @@ export default function RecentTransactions() {
       </div>
 
       <div className="space-y-4">
-        {transactions.map((transaction) => (
+        {formattedTransactions.length > 0 ? (
+          formattedTransactions.map((transaction) => (
           <div
             key={transaction.id}
             className="flex items-center justify-between p-4 rounded-xl hover:bg-indigo-50 transition-colors group"
@@ -113,7 +98,10 @@ export default function RecentTransactions() {
               </button>
             </div>
           </div>
-        ))}
+        ))
+        ) : (
+          <p className="text-gray-500 text-center py-8">No transactions yet</p>
+        )}
       </div>
     </div>
   )

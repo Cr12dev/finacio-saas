@@ -1,5 +1,6 @@
 import { Menu } from 'lucide-react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import Slidebar from '../components/Slidebar'
 import BudgetProgress from './components/BudgetProgress'
 import RecentTransactions from './components/RecentTransactions'
@@ -7,6 +8,7 @@ import SpendingChart from './components/SpendingChart'
 import StatsCards from './components/StatsCards'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
+import api from '../lib/api'
 
 /**
  * Dashboard page component.
@@ -18,8 +20,31 @@ import { useIsTablet } from '../../hooks/useMobileDevice'
  */
 export default function Dashboard() {
   const { businessId } = useParams()
+  const navigate = useNavigate()
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!businessId) {
+      navigate('/panel')
+      return
+    }
+    fetchTransactions()
+  }, [businessId, navigate])
+
+  const fetchTransactions = async () => {
+    if (!businessId) return
+    try {
+      const response = await api.get(`/transactions?business_id=${businessId}`)
+      setTransactions(response.data)
+    } catch (error) {
+      console.error('Error fetching transactions:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -51,16 +76,16 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Cards */}
-          <StatsCards />
+          <StatsCards transactions={transactions} />
 
           {/* Charts and Transactions */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SpendingChart />
+            <SpendingChart transactions={transactions} />
             <BudgetProgress />
           </div>
 
           {/* Recent Transactions */}
-          <RecentTransactions />
+          <RecentTransactions transactions={transactions} />
         </div>
       </main>
     </div>

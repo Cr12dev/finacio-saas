@@ -1,16 +1,44 @@
 import { BarChart3 } from 'lucide-react'
 
+interface SpendingChartProps {
+  /** Array of transactions to calculate spending from */
+  transactions: any[]
+}
+
 /**
  * Spending chart component displaying monthly spending overview.
  * Shows a bar chart of spending over the last 6 months with
  * total and average spending summaries.
  * 
+ * @param props - Component props
  * @returns JSX element containing the spending chart
  */
-export default function SpendingChart() {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-  const spending = [2800, 3200, 2900, 3500, 3100, 3280]
-  const maxSpending = Math.max(...spending)
+export default function SpendingChart({ transactions }: SpendingChartProps) {
+  const now = new Date()
+  const months = []
+  const spending = []
+
+  // Calculate spending for the last 6 months
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const monthName = date.toLocaleString('default', { month: 'short' })
+    months.push(monthName)
+
+    const monthSpending = transactions
+      .filter(t => {
+        const tDate = new Date(t.date)
+        return t.type === 'expense' && 
+               tDate.getMonth() === date.getMonth() && 
+               tDate.getFullYear() === date.getFullYear()
+      })
+      .reduce((sum, t) => sum + t.amount, 0)
+    
+    spending.push(monthSpending)
+  }
+
+  const maxSpending = Math.max(...spending, 1) // Avoid division by zero
+  const totalSpending = spending.reduce((sum, val) => sum + val, 0)
+  const averageSpending = totalSpending / spending.length
 
   return (
     <div className="bg-white rounded-2xl p-6 border-2 border-indigo-100">
@@ -48,11 +76,11 @@ export default function SpendingChart() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Total Spending</p>
-            <p className="text-2xl font-bold text-gray-900">$18,780.00</p>
+            <p className="text-2xl font-bold text-gray-900">${totalSpending.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-500">Average</p>
-            <p className="text-2xl font-bold text-indigo-600">$3,130.00</p>
+            <p className="text-2xl font-bold text-indigo-600">${averageSpending.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</p>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { ArrowDownRight, ArrowUpRight, Menu, Plus, Trash2 } from 'lucide-react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
@@ -34,8 +34,15 @@ async function addTransaction(transaction: { description: string; amount: number
 
 export default function Transactions() {
   const { businessId } = useParams()
+  const navigate = useNavigate()
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
+
+  useEffect(() => {
+    if (!businessId) {
+      navigate('/panel')
+    }
+  }, [businessId, navigate])
   const [isEditing, setIsEditing] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [transactions, setTransactions] = useState<Array<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }>>([])

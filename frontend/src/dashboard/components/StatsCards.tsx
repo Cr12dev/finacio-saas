@@ -13,6 +13,11 @@ interface StatCardProps {
   icon: React.ElementType
 }
 
+interface StatsCardsProps {
+  /** Array of transactions to calculate stats from */
+  transactions: any[]
+}
+
 /**
  * Individual stat card component displaying a financial metric.
  * Shows title, value, change percentage with trend indicator, and icon.
@@ -45,36 +50,71 @@ function StatCard({ title, value, change, isPositive, icon: Icon }: StatCardProp
  * Shows total balance, monthly income, monthly expenses, and savings
  * with trend indicators for each metric.
  * 
+ * @param props - Component props
  * @returns JSX element containing a grid of stat cards
  */
-export default function StatsCards() {
+export default function StatsCards({ transactions }: StatsCardsProps) {
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  // Calculate stats from transactions
+  const totalIncome = transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  const totalExpenses = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  const monthlyIncome = transactions
+    .filter(t => {
+      const date = new Date(t.date)
+      return t.type === 'income' && date.getMonth() === currentMonth && date.getFullYear() === currentYear
+    })
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  const monthlyExpenses = transactions
+    .filter(t => {
+      const date = new Date(t.date)
+      return t.type === 'expense' && date.getMonth() === currentMonth && date.getFullYear() === currentYear
+    })
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  const balance = totalIncome - totalExpenses
+  const savings = monthlyIncome - monthlyExpenses
+
+  const formatCurrency = (amount: number) => {
+    return `$${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+  }
+
   const stats = [
     {
       title: 'Total Balance',
-      value: '$24,563.00',
-      change: '+12.5%',
-      isPositive: true,
+      value: formatCurrency(balance),
+      change: '+0%',
+      isPositive: balance >= 0,
       icon: Wallet,
     },
     {
       title: 'Monthly Income',
-      value: '$8,450.00',
-      change: '+8.2%',
+      value: formatCurrency(monthlyIncome),
+      change: '+0%',
       isPositive: true,
       icon: DollarSign,
     },
     {
       title: 'Monthly Expenses',
-      value: '$3,280.00',
-      change: '-5.3%',
+      value: formatCurrency(monthlyExpenses),
+      change: '+0%',
       isPositive: true,
       icon: TrendingDown,
     },
     {
       title: 'Savings',
-      value: '$5,170.00',
-      change: '+15.7%',
-      isPositive: true,
+      value: formatCurrency(savings),
+      change: '+0%',
+      isPositive: savings >= 0,
       icon: TrendingUp,
     },
   ]
