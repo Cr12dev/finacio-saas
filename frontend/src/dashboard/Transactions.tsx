@@ -1,7 +1,10 @@
+"use client"
+
 import { ArrowDownRight, ArrowUpRight, Menu } from 'lucide-react'
 import Slidebar from '../components/Slidebar'
 import { useSidebar } from '../../hooks/useSidebar'
 import { useIsTablet } from '../../hooks/useMobileDevice'
+import { useState, useEffect } from 'react'
 
 /**
  * Transactions page component.
@@ -10,26 +13,31 @@ import { useIsTablet } from '../../hooks/useMobileDevice'
  * 
  * @returns JSX element containing the transactions layout
  */
+
+
+async function fetchTransactions(): Promise<Array<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }>> {
+  const response = await fetch('/api/transactions')
+  if (!response.ok) {
+    throw new Error('Failed to fetch transactions')
+  }
+  const data = await response.json()
+  return data
+}
+
 export default function Transactions() {
   const { isOpen, toggle, close } = useSidebar()
   const isTablet = useIsTablet()
 
-  const transactions = [
-    {
-      id: 1,
-      description: 'Grocery shopping',
-      amount: 100,
-      type: 'expense',
-      date: '2025-10-13',
-    },
-    {
-      id: 2,
-      description: 'Electricity bill',
-      amount: 200,
-      type: 'income',
-      date: '2025-10-13',
-    },
-  ]
+
+
+  const [transactions, setTransactions] = useState<Array<{ id: number; description: string; amount: number; type: 'expense' | 'income'; date: string }>>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchTransactions()
+      .then(setTransactions)
+      .catch((err) => setError(err.message))
+  }, [])
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -62,7 +70,9 @@ export default function Transactions() {
 
           {/* Content placeholder */}
           <div className="bg-white rounded-2xl p-12 border-2 border-indigo-100 text-left">
-            {transactions.length > 0 ? (
+            {error ? (
+              <p className="text-red-600">Error loading transactions: {error}</p>
+            ) : transactions.length > 0 ? (
               transactions.map((transaction, index) => (
                 <div key={index} className="bg-white rounded-2xl p-6 border-indigo-100 flex items-center">
                   <div
